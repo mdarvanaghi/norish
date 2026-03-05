@@ -12,6 +12,7 @@ import { decode } from "html-entities";
 
 import { normalizeRecipeFromJson } from "@/server/parser/normalize";
 import { parseIngredientWithDefaults } from "@/lib/helpers";
+import { extractPreparation } from "@/lib/parse-preparation";
 import { getUnits } from "@/config/server-config-loader";
 import { aiLogger } from "@/server/logger";
 import { matchCategory } from "@/server/ai/utils/category-matcher";
@@ -159,14 +160,19 @@ export async function normalizeExtractionOutput(
   // Combine both measurement systems
   normalized.recipeIngredients = [
     ...metricIngredients,
-    ...usIngredients.map((ing, i) => ({
-      ingredientId: null,
-      ingredientName: ing.description,
-      amount: ing.quantity != null ? ing.quantity : null,
-      unit: ing.unitOfMeasureID,
-      systemUsed: "us" as const,
-      order: i,
-    })),
+    ...usIngredients.map((ing, i) => {
+      const { name, preparation } = extractPreparation(ing.description);
+
+      return {
+        ingredientId: null,
+        ingredientName: name,
+        preparation,
+        amount: ing.quantity ?? null,
+        unit: ing.unitOfMeasureID,
+        systemUsed: "us" as const,
+        order: i,
+      };
+    }),
   ];
 
   normalized.steps = [...metricSteps, ...usSteps];

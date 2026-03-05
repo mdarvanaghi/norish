@@ -112,6 +112,13 @@ export default function IngredientsList() {
                   >
                     <SmartMarkdownRenderer disableLinks={isChecked} text={it.ingredientName} />
                   </span>
+                  {it.preparation && (
+                    <span
+                      className={`text-base font-bold ${isChecked ? "text-default-400 line-through" : "text-primary-600 dark:text-primary-400"}`}
+                    >
+                      , {it.preparation}
+                    </span>
+                  )}
                 </div>
               </div>
             </li>

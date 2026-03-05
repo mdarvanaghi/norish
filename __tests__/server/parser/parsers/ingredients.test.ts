@@ -146,6 +146,52 @@ describe("parseIngredients", () => {
     });
   });
 
+  describe("preparation parsing", () => {
+    it("extracts preparation from comma-separated description", () => {
+      const json = {
+        recipeIngredient: ["1 carrot, cubed"],
+      };
+
+      const result = parseIngredients(json, emptyUnits);
+
+      expect(result.ingredients[0].ingredientName).toBe("carrot");
+      expect(result.ingredients[0].preparation).toBe("cubed");
+    });
+
+    it("extracts multi-word preparation", () => {
+      const json = {
+        recipeIngredient: ["2 onions, finely chopped"],
+      };
+
+      const result = parseIngredients(json, emptyUnits);
+
+      expect(result.ingredients[0].ingredientName).toBe("onions");
+      expect(result.ingredients[0].preparation).toBe("finely chopped");
+    });
+
+    it("sets preparation to null when no comma is present", () => {
+      const json = {
+        recipeIngredient: ["1 cup milk"],
+      };
+
+      const result = parseIngredients(json, emptyUnits);
+
+      expect(result.ingredients[0].ingredientName).toBe("milk");
+      expect(result.ingredients[0].preparation).toBeNull();
+    });
+
+    it("extracts preparation alongside a unit", () => {
+      const json = {
+        recipeIngredient: ["500 grams flour, sifted"],
+      };
+
+      const result = parseIngredients(json, emptyUnits);
+
+      expect(result.ingredients[0].ingredientName).toBe("flour");
+      expect(result.ingredients[0].preparation).toBe("sifted");
+    });
+  });
+
   describe("unit normalization to canonical IDs", () => {
     it("normalizes Dutch 'scheut' to canonical 'splash'", () => {
       const unitsConfig = {

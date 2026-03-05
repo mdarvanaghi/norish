@@ -9,18 +9,26 @@ import { parseIngredientWithDefaults } from "./helpers";
  */
 
 /**
- * Normalize ingredient name: lowercase, strip qualifiers like (diced), [optional].
+ * Strip preparation and qualifiers from an ingredient name, preserving original case.
+ * Removes parenthetical/bracket/brace content and comma-delimited preparation suffixes.
  */
-export function normalizeIngredientNameForGrouping(name: string | null): string {
-  if (!name) return "";
-
+function stripIngredientQualifiers(name: string): string {
   return name
     .replace(/\s*\([^)]*\)\s*/g, " ")
     .replace(/\s*\[[^\]]*\]\s*/g, " ")
     .replace(/\s*\{[^}]*\}\s*/g, " ")
+    .replace(/,\s*.+$/, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
+    .trim();
+}
+
+/**
+ * Normalize ingredient name: lowercase and strip qualifiers like (diced), [optional].
+ */
+export function normalizeIngredientNameForGrouping(name: string | null): string {
+  if (!name) return "";
+
+  return stripIngredientQualifiers(name).toLowerCase();
 }
 
 /**
@@ -168,13 +176,7 @@ export function groupGroceriesByIngredient(
 function getDisplayName(name: string | null): string {
   if (!name) return "Unknown item";
 
-  return (
-    name
-      .replace(/\s*\([^)]*\)\s*/g, " ")
-      .replace(/\s*\[[^\]]*\]\s*/g, " ")
-      .replace(/\s+/g, " ")
-      .trim() || "Unknown item"
-  );
+  return stripIngredientQualifiers(name) || "Unknown item";
 }
 
 export function hasGroupableItems(groceries: GroceryDto[], storeId: string | null): boolean {

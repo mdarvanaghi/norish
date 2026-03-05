@@ -6,6 +6,7 @@ export function normalizeIngredient(i: any, system: MeasurementSystem) {
   return {
     ingredientId: null,
     ingredientName: String(i.ingredientName || "").trim(),
+    preparation: i.preparation ?? null,
     order: i.order ?? 0,
     amount: i.amount == null ? null : Number(i.amount),
     unit: i.unit ? String(i.unit).trim() : null,

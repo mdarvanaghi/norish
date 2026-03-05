@@ -15,6 +15,7 @@ export const recipeIngredients = pgTable(
       .references(() => ingredients.id, { onDelete: "cascade" }),
     amount: numeric("amount", { precision: 10, scale: 3 }),
     unit: text("unit"),
+    preparation: text("preparation"),
     order: numeric("order"),
     systemUsed: measurementSystemEnum("system_used").notNull().default("metric"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

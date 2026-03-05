@@ -180,6 +180,7 @@ export async function attachIngredientsToRecipeByInputTx(
     ingredientId: ri.ingredientId!,
     amount: ri.amount != null ? Number(ri.amount) : null,
     unit: normalizeUnit(ri.unit ?? "", units),
+    preparation: ri.preparation ?? null,
     order: ri.order,
     systemUsed: (ri.systemUsed as MeasurementSystem) || "metric",
   }));
@@ -202,6 +203,7 @@ export async function attachIngredientsToRecipeByInputTx(
         ingredientId: ing.id,
         amount: ri.amount != null ? Number(ri.amount) : null,
         unit: normalizeUnit(ri.unit ?? "", units), // ← Normalize unit to canonical ID
+        preparation: ri.preparation ?? null,
         order: ri.order,
         systemUsed: (ri.systemUsed as MeasurementSystem) || "metric",
       };

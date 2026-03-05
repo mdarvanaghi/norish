@@ -12,10 +12,12 @@ import { decode } from "html-entities";
 import { parseIngredientWithDefaults } from "@/lib/helpers";
 import { inferSystemUsedFromParsed } from "@/lib/determine-recipe-system";
 import { normalizeUnit } from "@/lib/unit-localization";
+import { extractPreparation } from "@/lib/parse-preparation";
 
 export interface ParsedIngredient {
   ingredientId: null;
   ingredientName: string;
+  preparation: string | null;
   amount: number | null;
   unit: string | null;
   systemUsed: MeasurementSystem;
@@ -63,14 +65,19 @@ export function parseIngredients(
   const parsed = parseIngredientWithDefaults(rawIngredients, units);
   const systemUsed = inferSystemUsedFromParsed(parsed);
 
-  const ingredients: ParsedIngredient[] = parsed.map((ing, i) => ({
-    ingredientId: null,
-    ingredientName: ing.description,
-    amount: ing.quantity != null ? ing.quantity : null,
-    unit: normalizeUnit(ing.unitOfMeasure ?? "", units),
-    systemUsed,
-    order: i,
-  }));
+  const ingredients: ParsedIngredient[] = parsed.map((ing, i) => {
+    const { name, preparation } = extractPreparation(ing.description);
+
+    return {
+      ingredientId: null,
+      ingredientName: name,
+      preparation,
+      amount: ing.quantity != null ? ing.quantity : null,
+      unit: normalizeUnit(ing.unitOfMeasure ?? "", units),
+      systemUsed,
+      order: i,
+    };
+  });
 
   return { ingredients, systemUsed };
 }

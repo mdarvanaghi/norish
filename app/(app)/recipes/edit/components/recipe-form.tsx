@@ -138,6 +138,7 @@ export default function RecipeForm({ mode, initialData }: RecipeFormProps) {
 
       const initIngredients: ParsedIngredient[] = filteredIngredients.map((ing) => ({
         ingredientName: ing.ingredientName,
+        preparation: ing.preparation ?? null,
         amount: ing.amount,
         unit: ing.unit,
         order: ing.order,
@@ -265,6 +266,7 @@ export default function RecipeForm({ mode, initialData }: RecipeFormProps) {
         categories,
         recipeIngredients: ingredients.map((ing, idx) => ({
           ingredientName: ing.ingredientName,
+          preparation: ing.preparation,
           ingredientId: null,
           amount: ing.amount,
           unit: ing.unit,

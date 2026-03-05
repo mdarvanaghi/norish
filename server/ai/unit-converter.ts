@@ -153,7 +153,12 @@ export async function convertRecipeDataWithAI(
 
     return aiSuccess(
       {
-        ingredients: validatedIngredients.data.map((i) => normalizeIngredient(i, targetSystem)),
+        ingredients: validatedIngredients.data.map((i) => {
+          const normalized = normalizeIngredient(i, targetSystem);
+          const original = recipe.recipeIngredients.find((orig) => orig.order === i.order);
+
+          return { ...normalized, preparation: original?.preparation ?? null };
+        }),
         steps: validatedSteps.data.map((s) => normalizeStep(s, targetSystem)),
       },
       {

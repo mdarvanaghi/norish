@@ -8,11 +8,13 @@ import { useTranslations } from "next-intl";
 
 import SmartTextInput from "@/components/shared/smart-text-input";
 import { parseIngredientWithDefaults, debounce } from "@/lib/helpers";
+import { extractPreparation } from "@/lib/parse-preparation";
 import { useUnitsQuery } from "@/hooks/config";
 import { MeasurementSystem } from "@/types";
 
 export interface ParsedIngredient {
   ingredientName: string;
+  preparation: string | null;
   amount: number | null;
   unit: string | null;
   order: number;
@@ -60,7 +62,9 @@ export default function IngredientInput({
         if (ing.unit) parts.push(ing.unit);
         if (ing.ingredientName) parts.push(ing.ingredientName);
 
-        return createItem(parts.join(" "));
+        const base = parts.join(" ");
+
+        return createItem(ing.preparation ? `${base}, ${ing.preparation}` : base);
       });
 
       setItems([...formatted, createItem("")]);
@@ -78,8 +82,11 @@ export default function IngredientInput({
 
       if (!parsed || parsed.length === 0) {
         // Fallback: treat entire text as ingredient name
+        const { name, preparation } = extractPreparation(trimmed);
+
         return {
-          ingredientName: trimmed,
+          ingredientName: name,
+          preparation,
           amount: null,
           unit: null,
           order,
@@ -88,9 +95,11 @@ export default function IngredientInput({
       }
 
       const first = parsed[0];
+      const { name, preparation } = extractPreparation(first.description || trimmed);
 
       return {
-        ingredientName: first.description || trimmed,
+        ingredientName: name,
+        preparation,
         amount: first.quantity ? Number(first.quantity) : null,
         unit: first.unitOfMeasure || null,
         order,
